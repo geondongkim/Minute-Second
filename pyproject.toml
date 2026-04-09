@@ -1,0 +1,32 @@
+[project]
+name = "minute-second"
+version = "0.1.0"
+description = "Streamlit 기반 '동영상 파일 업로드 -> 오디오 추출 -> STT 처리 -> LLM 요약' 자동 회의록 웹 서비스"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "faster-whisper>=1.0.0",
+    "ffmpeg-python>=0.2.0",
+    "google-genai>=0.1.0",
+    "pydub>=0.25.1",
+    "python-dotenv>=1.0.0",
+    "streamlit>=1.40.0",
+    "torch",
+    "torchaudio",
+    "huggingface_hub[hf_xet]",
+    "whisperx @ git+https://github.com/m-bain/whisperX.git"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchaudio = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
