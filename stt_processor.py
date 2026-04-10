@@ -57,6 +57,34 @@ def _get_align_model(language_code: str) -> tuple:
     return _align_models[language_code]
 
 
+def _build_speech_only_audio(
+    audio_data: np.ndarray,
+    segments: list[dict],
+    sample_rate: int = 16000,
+    pad_ms: int = 100,
+) -> tuple[np.ndarray, list[dict]]:
+    """STT 세그먼트 경계만 이어붙인 speech-only 오디오를 생성한다.
+    반환값의 타임스탬프는 이어붙인 오디오 기준이며, 원본 기준과 다르다.
+    결과 텍스트(회의록)에는 영향 없음 — 타임스탬프 절대값은 불필요."""
+    pad = int(pad_ms * sample_rate / 1000)
+    chunks: list[np.ndarray] = []
+    remapped: list[dict] = []
+    cursor = 0.0
+
+    for seg in segments:
+        s = max(0, int(seg["start"] * sample_rate) - pad)
+        e = min(len(audio_data), int(seg["end"] * sample_rate) + pad)
+        chunk = audio_data[s:e]
+        chunks.append(chunk)
+        duration = len(chunk) / sample_rate
+        remapped.append({"start": cursor, "end": cursor + duration, "text": seg["text"]})
+        cursor += duration
+
+    if not chunks:
+        return audio_data, segments
+    return np.concatenate(chunks), remapped
+
+
 # ─── Public API ───────────────────────────────────────────────────────────────
 
 def process_audio(
@@ -112,14 +140,24 @@ def process_audio(
         cb("오디오 데이터 로드 중...")
         audio_data: np.ndarray = whisperx.load_audio(audio_path)
 
+        # ── STT 세그먼트로부터 묵음 제거 후 speech-only 오디오 생성 ──────────
+        original_duration = len(audio_data) / 16000
+        speech_audio, speech_segments = _build_speech_only_audio(audio_data, transcribed_segments)
+        speech_duration = len(speech_audio) / 16000
+        cb(
+            f"묵음 제거 완료: {original_duration:.0f}초 → {speech_duration:.0f}초 "
+            f"({speech_duration / original_duration * 100:.0f}% 유지) — "
+            "이하 Align·Diarize는 speech-only 오디오 기준으로 처리합니다."
+        )
+
         cb(f"음성 정렬 중 (언어: {info.language})...")
         align_model, metadata = _get_align_model(info.language)
         aligned_result = whisperx.align(
-            transcribed_segments, align_model, metadata, audio_data, "cpu"
+            speech_segments, align_model, metadata, speech_audio, "cpu"
         )
 
-        cb("화자 분리 중 (CPU에서 수십 분 소요 가능 — 최대 8명 기준으로 탐색 범위를 제한합니다)...")
-        diarize_segments = diarize_model(audio_data, min_speakers=1, max_speakers=6)
+        cb("화자 분리 중 (speech-only 오디오 기준, CPU에서 수 분 소요 가능)...")
+        diarize_segments = diarize_model(speech_audio, min_speakers=1, max_speakers=8)
 
         import pandas as pd
         if isinstance(diarize_segments, pd.DataFrame) and diarize_segments.empty:
