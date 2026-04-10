@@ -154,10 +154,11 @@ class _DiarizeTimer:
 def process_audio(
     audio_path: str,
     progress_callback: Callable[[str], None] | None = None,
+    diarize: bool = True,
 ) -> tuple[str, str]:
     job_start = time.monotonic()
     model = _get_whisper_model()
-    diarize_model = _get_diarize_model()
+    diarize_model = _get_diarize_model() if diarize else None
 
     def cb(msg: str) -> None:
         if progress_callback:
@@ -203,6 +204,11 @@ def process_audio(
     combined_text = " ".join(full_text)
     prog(52, "전사 완료", 100)
     cb("전사 완료.")
+
+    if not diarize:
+        prog(100, "완료", 100)
+        plain_lines = "\n".join(f"- {seg['text'].strip()}" for seg in transcribed_segments)
+        return combined_text, plain_lines
 
     try:
         if diarize_model is None:

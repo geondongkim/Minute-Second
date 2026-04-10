@@ -59,6 +59,11 @@ def main() -> None:
         default="results",
         help="결과 .md 파일을 저장할 디렉터리 (기본: results/)",
     )
+    parser.add_argument(
+        "--no-diarize",
+        action="store_true",
+        help="화자 분리 건너뜀 (빠른 처리 / 비교용)",
+    )
     args = parser.parse_args()
 
     video_path = Path(args.video)
@@ -72,10 +77,14 @@ def main() -> None:
     # 결과 파일명: 원본 파일명 + 타임스탬프.md
     stem = video_path.stem
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    output_path = output_dir / f"{stem}_{timestamp}.md"
+    diarize = not args.no_diarize
+    suffix = "" if diarize else "_no_diarize"
+    output_path = output_dir / f"{stem}_{timestamp}{suffix}.md"
 
     print(f"📹 입력 파일: {video_path}")
     print(f"📄 출력 파일: {output_path}")
+    if not diarize:
+        print("⚡ 화자 분리: 건너뜀 (--no-diarize)")
     print("-" * 60)
 
     start = time.monotonic()
@@ -90,8 +99,9 @@ def main() -> None:
         print(f"  → 임시 오디오: {audio_path}")
 
         # ── 2단계: STT + 화자 분리 ─────────────────────────────
-        print("\n🔤 [2/3] STT + 화자 분리 시작...")
-        combined_text, speaker_text = process_audio(audio_path, _progress)
+        label = "STT 시작..." if diarize else "STT 시작 (화자분리 없음)..."
+        print(f"\n🔤 [2/3] {label}")
+        combined_text, speaker_text = process_audio(audio_path, _progress, diarize=diarize)
 
     print()  # 게이지 줄 끝 처리
 
@@ -107,7 +117,8 @@ def main() -> None:
     md_content = f"""# 회의록: {video_path.name}
 
 > 생성일시: {time.strftime("%Y-%m-%d %H:%M:%S")}  
-> 처리 소요시간: {elapsed_str}
+> 처리 소요시간: {elapsed_str}  
+> 화자 분리: {"✅ 포함" if diarize else "❌ 미포함 (--no-diarize)"}
 
 ---
 
@@ -115,7 +126,7 @@ def main() -> None:
 
 ---
 
-## 🗣️ 화자별 발화 내역
+## 🗣️ {"화자별 발화 내역" if diarize else "발화 내역 (화자 미구분)"}
 
 ```
 {speaker_text}
