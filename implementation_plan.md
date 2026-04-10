@@ -32,12 +32,29 @@
 | 파일 | 역할 |
 |---|---|
 | `main.py` | FastAPI 앱, 잡 관리, SSE |
+| `run_cli.py` | CLI 파이프라인 (argparse, 터미널 게이지, `.md` 저장) |
 | `stt_processor.py` | Faster-Whisper + WhisperX 화자 분리 |
 | `audio_extractor.py` | ffmpeg 오디오 추출 (sync + async 버전) |
 | `summarizer.py` | Gemini API 요약 |
 | `frontend/src/App.tsx` | React 상태 머신 |
 | `frontend/src/api.ts` | createJob / subscribeJobEvents / fetchJobResult |
 | `frontend/src/components/` | UploadZone, ProgressLog, ResultTabs |
+
+---
+
+## CLI 사용법 (`run_cli.py`)
+
+```powershell
+# 단일 파일 처리
+uv run python run_cli.py "videos/회의.mp4"
+
+# 출력 디렉터리 지정
+uv run python run_cli.py "videos/회의.mp4" --output-dir "output/"
+```
+
+- 결과: `results/<파일명>_<YYYYmmdd_HHMMSS>.md`
+- 구성: AI 요약(Gemini) + 화자별 스크립트 + 전체 원문(STT)
+- 터미널 게이지: `[████░░] 45%  화자 분리 중 (20%)  ETA 2분 30초`
 
 ---
 
@@ -86,3 +103,5 @@ uv run uvicorn main:app --port 8000   # /assets 및 SPA fallback 서빙
 | v1.1 | - | @st.cache_resource 모델 캐싱, whisperX 화자분리 통합 |
 | v1.2 | - | torchcodec DLL 오류 수정, 진행률 콜백 추가 |
 | v2 | 현재 | FastAPI + React 완전 이관, SSE 실시간 진행, 비동기 최적화 |
+| v2.1 | 현재 | STT 최적화 (small 모델, greedy, VAD, silence pre-cut), 실시간 게이지 + ETA |
+| v2.2 | 현재 | `run_cli.py` CLI 스크립트 추가 (argparse, 터미널 게이지, `results/` 자동 저장) |
