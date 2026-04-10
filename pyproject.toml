@@ -28,6 +28,11 @@ explicit = true
 
 [tool.uv]
 package = false
+override-dependencies = [
+    # pyannote-audio 4.x가 torchcodec을 무조건 요구하지만, Windows에서는 DLL 로드 실패.
+    # Linux x86_64 / macOS에서만 설치되도록 제한.
+    "torchcodec>=0.6.0,<0.8.0; (sys_platform == 'linux' and platform_machine == 'x86_64') or sys_platform == 'darwin'",
+]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }

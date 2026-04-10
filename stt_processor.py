@@ -62,7 +62,7 @@ def process_audio(audio_path: str, progress_callback=None):
     combined_text = " ".join(full_text)
 
     if progress_callback:
-        progress_callback("화자 분리 중 (WhisperX Diarization)...")
+        progress_callback("전사 완료. 오디오 정렬(alignment) 준비 중...")
 
     try:
         if diarize_model is None:
@@ -71,15 +71,21 @@ def process_audio(audio_path: str, progress_callback=None):
             )
 
         # 오디오를 numpy array로 1회 로드 (재사용)
+        if progress_callback:
+            progress_callback("오디오 데이터 로드 중...")
         audio_data: np.ndarray = whisperx.load_audio(audio_path)
 
         # alignment: 언어별 캐시된 모델 사용
+        if progress_callback:
+            progress_callback(f"음성 정렬 중 (언어: {info.language})...")
         align_model, metadata = _load_align_model(info.language)
         aligned_result = whisperx.align(
             transcribed_segments, align_model, metadata, audio_data, "cpu"
         )
 
         # diarization: pre-loaded numpy array 전달 (torchcodec 사용 안 함)
+        if progress_callback:
+            progress_callback("화자 분리 중 (CPU에서 수 분 소요될 수 있습니다)...")
         diarize_segments = diarize_model(audio_data)
         result = whisperx.assign_word_speakers(diarize_segments, aligned_result)
 
