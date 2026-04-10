@@ -22,10 +22,10 @@ def _get_whisper_model() -> WhisperModel:
         with _lock:
             if _whisper_model is None:
                 _whisper_model = WhisperModel(
-                    "medium",
+                    "small",           # medium 대비 ~2× 빠름, 한국어 정확도 충분
                     device="cpu",
                     compute_type="int8",
-                    cpu_threads=8,
+                    cpu_threads=os.cpu_count() or 8,   # 논리 코어 전부 활용
                     num_workers=2,
                 )
     return _whisper_model
@@ -71,7 +71,20 @@ def process_audio(
             progress_callback(msg)
 
     cb("STT 변환 중 (Faster-Whisper)...")
-    segments, info = model.transcribe(audio_path, vad_filter=True)
+    segments, info = model.transcribe(
+        audio_path,
+        language="ko",                    # 언어 감지 건너뜀 (~5초 절약)
+        beam_size=1,                      # greedy 디코딩 — beam search 대비 3–5× 빠름
+        best_of=1,                        # 후보 생성 최소화
+        temperature=0,                    # 결정론적 출력 (재샘플링 없음)
+        condition_on_previous_text=False, # 세그먼트 간 컨텍스트 의존 제거
+        word_timestamps=False,            # whisperX 정렬이 따로 처리하므로 불필요
+        vad_filter=True,
+        vad_parameters={
+            "min_silence_duration_ms": 500,  # 기본 2000ms → 무음 구간 압축
+            "speech_pad_ms": 200,            # 기본 400ms → 패딩 절반 축소
+        },
+    )
 
     transcribed_segments: list[dict] = []
     full_text: list[str] = []
