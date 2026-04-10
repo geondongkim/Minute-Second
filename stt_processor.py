@@ -118,8 +118,13 @@ def process_audio(
             transcribed_segments, align_model, metadata, audio_data, "cpu"
         )
 
-        cb("화자 분리 중 (CPU에서 수 분 소요될 수 있습니다)...")
-        diarize_segments = diarize_model(audio_data)
+        cb("화자 분리 중 (CPU에서 수십 분 소요 가능 — 최대 8명 기준으로 탐색 범위를 제한합니다)...")
+        diarize_segments = diarize_model(audio_data, min_speakers=1, max_speakers=6)
+
+        import pandas as pd
+        if isinstance(diarize_segments, pd.DataFrame) and diarize_segments.empty:
+            raise RuntimeError("화자 분리 결과가 비어있습니다. 오디오에 발화 구간이 충분하지 않을 수 있습니다.")
+
         result = whisperx.assign_word_speakers(diarize_segments, aligned_result)
 
         speaker_lines = [
