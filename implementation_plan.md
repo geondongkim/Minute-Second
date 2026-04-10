@@ -83,3 +83,27 @@ GPU가 없는 로컬 CPU 환경을 고려하여 최적화 및 안정성 확보.
 #### 5. 모델 로딩 구조 개선
 - **근본 원인**: `load_stt_resources()`에 Whisper + Diarize 모델이 묶여 있어 둘 중 하나 실패 시 모두 재로드됨.
 - **수정**: `_load_whisper_model()`, `_load_diarize_model()`, `_load_align_model(lang)` 3개로 분리해 독립 캐싱.
+
+## Bug Fixes — uv run 의존성 충돌 해결 (2026-04-11)
+
+### 문제
+`uv run streamlit run app.py` 실행 시 `torch` 패키지에 대한 인덱스 충돌:
+```
+Requirements contain conflicting indexes for package `torch` in all marker environments:
+- https://download.pytorch.org/whl/cpu
+- https://download.pytorch.org/whl/cu128
+```
+
+### 근본 원인
+whisperX `pyproject.toml`의 `[tool.uv.sources]`에 Windows x86_64 환경에서 `torch`를 `cu128` (CUDA) 인덱스에서 해결하도록 설정되어 있었음. uv 0.11.1은 root project의 sources가 git-sourced 의존성의 sources를 재정의하지 않고 병합함 → CPU/CUDA 두 인덱스 동시 요구 → 충돌.
+
+### 해결 방법
+1. **whisperX를 git URL → 로컬 경로 참조로 변경**: `ref/whisperX/` 로컬 사본을 수정하여 완전한 제어권 확보.
+2. **`ref/whisperX/pyproject.toml` 수정**:
+   - `[tool.uv.sources]`: marker-based 인덱스 제거 → `{ index = "pytorch-cpu" }` 단순화
+   - `[[tool.uv.index]]`: cu128 인덱스 완전 제거
+   - `torchcodec` 의존성: `sys_platform == 'win32'` 조건 제거 (Windows DLL 오류 방지)
+3. **root `pyproject.toml` 변경**:
+   - `whisperx @ git+https://...` → `whisperx>=3.8.5` + `[tool.uv.sources] whisperx = { path = "./ref/whisperX" }`
+   - `[tool.uv] package = false` 추가 (Streamlit 앱은 Python 패키지가 아님 — hatchling 빌드 불필요)
+4. **검증**: `uv sync` Exit code: 0, `uv run python -c "import whisperx; import torch" → OK 2.8.0+cpu`

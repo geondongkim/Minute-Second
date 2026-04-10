@@ -11,10 +11,10 @@ dependencies = [
     "pydub>=0.25.1",
     "python-dotenv>=1.0.0",
     "streamlit>=1.40.0",
-    "torch",
-    "torchaudio",
+    "torch==2.8.0+cpu",
+    "torchaudio==2.8.0+cpu",
     "huggingface_hub[hf_xet]",
-    "whisperx @ git+https://github.com/m-bain/whisperX.git"
+    "whisperx>=3.8.5"
 ]
 
 [build-system]
@@ -26,7 +26,11 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
+[tool.uv]
+package = false
+
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }
 torchaudio = { index = "pytorch-cpu" }
 torchvision = { index = "pytorch-cpu" }
+whisperx = { path = "./ref/whisperX" }
