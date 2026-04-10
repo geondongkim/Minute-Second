@@ -2,13 +2,13 @@ import { useCallback, useState } from 'react'
 import UploadZone from './components/UploadZone'
 import ProgressLog from './components/ProgressLog'
 import ResultTabs from './components/ResultTabs'
-import { createJob, subscribeJobEvents, fetchJobResult, type JobResult } from './api'
+import { createJob, subscribeJobEvents, fetchJobResult, type JobResult, type ProgressEvent } from './api'
 import './App.css'
 
 type AppState =
   | { phase: 'idle' }
   | { phase: 'uploading'; progress: number }
-  | { phase: 'processing'; jobId: string; logs: string[] }
+  | { phase: 'processing'; jobId: string; logs: string[]; progress: ProgressEvent | null }
   | { phase: 'done'; result: JobResult }
   | { phase: 'error'; message: string }
 
@@ -23,7 +23,7 @@ export default function App() {
         setState({ phase: 'uploading', progress: pct }),
       )
 
-      setState({ phase: 'processing', jobId, logs: [] })
+      setState({ phase: 'processing', jobId, logs: [], progress: null })
 
       subscribeJobEvents(
         jobId,
@@ -42,6 +42,10 @@ export default function App() {
           }
         },
         (msg) => setState({ phase: 'error', message: msg }),
+        (p) =>
+          setState((prev) =>
+            prev.phase === 'processing' ? { ...prev, progress: p } : prev,
+          ),
       )
     } catch (e) {
       setState({ phase: 'error', message: String(e) })
@@ -75,7 +79,7 @@ export default function App() {
         )}
 
         {state.phase === 'processing' && (
-          <ProgressLog logs={state.logs} />
+          <ProgressLog logs={state.logs} progress={state.progress} />
         )}
 
         {state.phase === 'done' && (

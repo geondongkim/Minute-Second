@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import tempfile
+import time
 import uuid
 from typing import AsyncGenerator
 
@@ -78,16 +80,32 @@ async def _process_job(job_id: str, video_path: str, queue: asyncio.Queue) -> No
         _jobs[job_id]["logs"].append(msg)
         loop.call_soon_threadsafe(queue.put_nowait, msg)
 
+    def push_progress(overall: int, stage_label: str, stage_pct: int, eta_s: int | None = None) -> None:
+        push(
+            "__PROGRESS__:"
+            + json.dumps(
+                {"overall": overall, "stage_label": stage_label,
+                 "stage_pct": stage_pct, "elapsed_s": int(time.monotonic() - _job_start),
+                 "eta_s": eta_s},
+                ensure_ascii=False,
+            )
+        )
+
+    _job_start = time.monotonic()
     try:
+        push_progress(1, "오디오 추출 중", 10)
         push("오디오 추출 중...")
+        push_progress(5, "오디오 추출 완료", 100)
         async with async_extract_audio_from_video(video_path) as audio_path:
             # CPU-bound STT 처리 — asyncio.to_thread 로 이벤트 루프 블로킹 방지
             combined_text, speaker_text = await asyncio.to_thread(
                 process_audio, audio_path, push
             )
 
+        push_progress(95, "AI 요약 생성 중", 10)
         push("요약 생성 중...")
         summary = await asyncio.to_thread(summarize_text, combined_text)
+        push_progress(100, "완료", 100, 0)
 
         _jobs[job_id].update(
             status="done",

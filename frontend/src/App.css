@@ -154,16 +154,80 @@
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
 }
 
-.progress-log-header {
+/* ── Gauge sections ──────────────────────────────────────────── */
+.gauge-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gauge-header {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  justify-content: space-between;
+  font-size: 0.88rem;
   font-weight: 600;
   color: #374151;
+}
+
+.gauge-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.gauge-value {
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
+  text-align: right;
+  color: #4f46e5;
+}
+
+.gauge-track {
+  width: 100%;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.overall-track {
+  height: 14px;
+}
+
+.stage-track {
+  height: 8px;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.overall-fill {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+.stage-fill {
+  background: #a5b4fc;
+}
+
+.gauge-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 0.2rem;
+}
+
+.stage-gauge-section {
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
 }
 
 .spinner {

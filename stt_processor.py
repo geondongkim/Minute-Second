@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 import os
 import threading
+import time
 from typing import Callable
 
 import numpy as np
@@ -85,12 +87,75 @@ def _build_speech_only_audio(
     return np.concatenate(chunks), remapped
 
 
+def _emit_progress(
+    cb: Callable[[str], None],
+    overall: int,
+    stage_label: str,
+    stage_pct: int,
+    elapsed_s: float,
+    eta_s: float | None = None,
+) -> None:
+    """'__PROGRESS__:{json}' 형식으로 프런트엔드에 진행 정보를 전송한다."""
+    cb(
+        "__PROGRESS__:"
+        + json.dumps(
+            {
+                "overall": max(0, min(100, overall)),
+                "stage_label": stage_label,
+                "stage_pct": max(0, min(100, stage_pct)),
+                "elapsed_s": int(elapsed_s),
+                "eta_s": int(eta_s) if eta_s is not None else None,
+            },
+            ensure_ascii=False,
+        )
+    )
+
+
+class _DiarizeTimer:
+    """화자 분리(pyannote) 실행 중 2초마다 progress 이벤트를 emit하는 백그라운드 쓰레드.
+    pyannote 자체에는 진행률 콜백이 없으므로 경과 시간 + ETA 추정으로 표시한다."""
+
+    def __init__(self, cb: Callable[[str], None], speech_duration_s: float, job_start: float):
+        self._cb = cb
+        # 경험치: i7-13xx CPU에서 pyannote ≈ speech_duration × 3배 소요
+        self._estimated_s = max(speech_duration_s * 3.0, 20.0)
+        self._job_start = job_start
+        self._stage_start = 0.0
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+
+    def __enter__(self):
+        self._stage_start = time.monotonic()
+        self._thread.start()
+        return self
+
+    def __exit__(self, *_):
+        self._stop.set()
+        self._thread.join(timeout=5)
+
+    def _run(self) -> None:
+        while not self._stop.wait(2.0):
+            stage_elapsed = time.monotonic() - self._stage_start
+            total_elapsed = time.monotonic() - self._job_start
+            stage_pct = min(99, int(stage_elapsed / self._estimated_s * 100))
+            eta_s = max(0.0, self._estimated_s - stage_elapsed)
+            _emit_progress(
+                self._cb,
+                overall=70 + int(stage_pct * 0.23),  # 70 → 93%
+                stage_label="화자 분리 중",
+                stage_pct=stage_pct,
+                elapsed_s=total_elapsed,
+                eta_s=eta_s,
+            )
+
+
 # ─── Public API ───────────────────────────────────────────────────────────────
 
 def process_audio(
     audio_path: str,
     progress_callback: Callable[[str], None] | None = None,
 ) -> tuple[str, str]:
+    job_start = time.monotonic()
     model = _get_whisper_model()
     diarize_model = _get_diarize_model()
 
@@ -98,19 +163,24 @@ def process_audio(
         if progress_callback:
             progress_callback(msg)
 
+    def prog(overall: int, stage_label: str, stage_pct: int, eta_s: float | None = None) -> None:
+        _emit_progress(cb, overall, stage_label, stage_pct, time.monotonic() - job_start, eta_s)
+
+    # ── 1단계: STT ────────────────────────────────────────────────────────────
+    prog(5, "음성 텍스트 변환 중", 0)
     cb("STT 변환 중 (Faster-Whisper)...")
     segments, info = model.transcribe(
         audio_path,
-        language="ko",                    # 언어 감지 건너뜀 (~5초 절약)
-        beam_size=1,                      # greedy 디코딩 — beam search 대비 3–5× 빠름
-        best_of=1,                        # 후보 생성 최소화
-        temperature=0,                    # 결정론적 출력 (재샘플링 없음)
-        condition_on_previous_text=False, # 세그먼트 간 컨텍스트 의존 제거
-        word_timestamps=False,            # whisperX 정렬이 따로 처리하므로 불필요
+        language="ko",
+        beam_size=1,
+        best_of=1,
+        temperature=0,
+        condition_on_previous_text=False,
+        word_timestamps=False,
         vad_filter=True,
         vad_parameters={
-            "min_silence_duration_ms": 500,  # 기본 2000ms → 무음 구간 압축
-            "speech_pad_ms": 200,            # 기본 400ms → 패딩 절반 축소
+            "min_silence_duration_ms": 500,
+            "speech_pad_ms": 200,
         },
     )
 
@@ -125,11 +195,14 @@ def process_audio(
         )
         if info.duration > 0 and segment.end - _last_reported[0] >= 5.0:
             _last_reported[0] = segment.end
-            pct = segment.end / info.duration * 100
-            cb(f"STT 변환 중: {segment.end:.0f}초 / {info.duration:.0f}초 ({pct:.0f}%)")
+            stt_pct = segment.end / info.duration * 100
+            overall = 5 + int(stt_pct * 0.47)  # 5% → 52%
+            cb(f"STT 변환 중: {segment.end:.0f}초 / {info.duration:.0f}초 ({stt_pct:.0f}%)")
+            prog(overall, "음성 텍스트 변환 중", int(stt_pct))
 
     combined_text = " ".join(full_text)
-    cb("전사 완료. 오디오 정렬 준비 중...")
+    prog(52, "전사 완료", 100)
+    cb("전사 완료.")
 
     try:
         if diarize_model is None:
@@ -137,28 +210,37 @@ def process_audio(
                 "화자 분리 모델 로드 실패 — HF_TOKEN이 없거나 pyannote 접근 권한이 없습니다."
             )
 
+        # ── 2단계: 묵음 제거 ─────────────────────────────────────────────────
+        prog(54, "오디오 로드 및 묵음 제거 중", 20)
         cb("오디오 데이터 로드 중...")
         audio_data: np.ndarray = whisperx.load_audio(audio_path)
 
-        # ── STT 세그먼트로부터 묵음 제거 후 speech-only 오디오 생성 ──────────
         original_duration = len(audio_data) / 16000
         speech_audio, speech_segments = _build_speech_only_audio(audio_data, transcribed_segments)
         speech_duration = len(speech_audio) / 16000
+        prog(57, "묵음 제거 완료", 100)
         cb(
-            f"묵음 제거 완료: {original_duration:.0f}초 → {speech_duration:.0f}초 "
-            f"({speech_duration / original_duration * 100:.0f}% 유지) — "
-            "이하 Align·Diarize는 speech-only 오디오 기준으로 처리합니다."
+            f"묵음 제거: {original_duration:.0f}초 → {speech_duration:.0f}초 "
+            f"({speech_duration / original_duration * 100:.0f}% 유지)"
         )
 
+        # ── 3단계: 음성 정렬 ─────────────────────────────────────────────────
+        prog(59, "음성 정렬 중", 10)
         cb(f"음성 정렬 중 (언어: {info.language})...")
         align_model, metadata = _get_align_model(info.language)
         aligned_result = whisperx.align(
             speech_segments, align_model, metadata, speech_audio, "cpu"
         )
+        prog(70, "음성 정렬 완료", 100)
 
-        cb("화자 분리 중 (speech-only 오디오 기준, CPU에서 수 분 소요 가능)...")
-        diarize_segments = diarize_model(speech_audio, min_speakers=1, max_speakers=8)
+        # ── 4단계: 화자 분리 ─────────────────────────────────────────────────
+        eta_diarize = speech_duration * 3.0
+        prog(70, "화자 분리 준비", 0, eta_diarize)
+        cb(f"화자 분리 중... (예상 소요: 약 {eta_diarize / 60:.0f}분)")
+        with _DiarizeTimer(cb, speech_duration, job_start):
+            diarize_segments = diarize_model(speech_audio, min_speakers=1, max_speakers=8)
 
+        prog(93, "화자 배정 중", 80)
         import pandas as pd
         if isinstance(diarize_segments, pd.DataFrame) and diarize_segments.empty:
             raise RuntimeError("화자 분리 결과가 비어있습니다. 오디오에 발화 구간이 충분하지 않을 수 있습니다.")
@@ -170,8 +252,10 @@ def process_audio(
             for seg in result["segments"]
         ]
         full_speaker_text = "\n".join(speaker_lines)
+        prog(94, "화자 분리 완료", 100)
 
     except Exception as exc:
+        prog(94, "화자 분리 실패", 100)
         full_speaker_text = (
             f"[화자 분리 실패: {exc}]\n\n"
             + "\n".join(f"- {seg['text']}" for seg in transcribed_segments)
