@@ -15,11 +15,15 @@ export interface ProgressEvent {
 export async function createJob(
   file: File,
   onProgress: (pct: number) => void,
+  meetingType: string = 'general',
+  refText: string = '',
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     const form = new FormData()
     form.append('file', file)
+    form.append('meeting_type', meetingType)
+    form.append('ref_text', refText)
 
     xhr.upload.addEventListener('progress', (e) => {
       if (e.lengthComputable) onProgress((e.loaded / e.total) * 100)

@@ -1,4 +1,16 @@
 ﻿/* ─── Layout ────────────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .app {
   min-height: 100vh;
   background: #f9fafb;
@@ -33,7 +45,7 @@
 .upload-zone {
   border: 2px dashed #d1d5db;
   border-radius: 12px;
-  padding: 3.5rem 2rem;
+  padding: 3rem 2rem;
   text-align: center;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
@@ -380,3 +392,112 @@
   color: #dc2626;
   font-size: 0.9rem;
 }
+
+/* ─── Upload zone wrapper & settings ────────────────────────── */
+.upload-zone-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  overflow: hidden;
+}
+
+.upload-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: 0;
+  margin: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.upload-settings {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #fff;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.setting-row label {
+  font-size: 0.88rem;
+  color: #374151;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.setting-row select {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+}
+
+.setting-row select:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 1px;
+}
+
+.ref-file-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.ref-file-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.7rem !important;
+  font-size: 0.82rem !important;
+}
+
+.btn-remove {
+  color: #ef4444 !important;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f3f4f6;
+  background: #f9fafb;
+}
+
+/* ─── Tab actions (copy + download) ─────────────────────────── */
+.tab-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.download-btn {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+.download-btn:hover {
+  background: #dcfce7 !important;
+}
+

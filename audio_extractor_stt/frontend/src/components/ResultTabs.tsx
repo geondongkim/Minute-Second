@@ -24,7 +24,26 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+function DownloadButton({ text, filename }: { text: string; filename: string }) {
+  const handleDownload = () => {
+    const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <button className="copy-btn download-btn" onClick={handleDownload}>
+      💾 저장
+    </button>
+  )
+}
+
 const TABS = ['📌 회의 요약', '🗣️ 화자별 스크립트', '📄 전체 원문'] as const
+const FILENAMES = ['meeting-summary.md', 'speaker-script.txt', 'full-transcript.txt']
 
 export default function ResultTabs({ result }: Props) {
   const [active, setActive] = useState(0)
@@ -46,7 +65,10 @@ export default function ResultTabs({ result }: Props) {
       </div>
 
       <div className="tab-content">
-        <CopyButton text={contents[active]} />
+        <div className="tab-actions">
+          <CopyButton text={contents[active]} />
+          <DownloadButton text={contents[active]} filename={FILENAMES[active]} />
+        </div>
 
         {active === 0 ? (
           <div className="markdown-body">
@@ -58,6 +80,8 @@ export default function ResultTabs({ result }: Props) {
           <textarea
             className="result-area"
             readOnly
+            title={TABS[active]}
+            aria-label={TABS[active]}
             value={contents[active]}
           />
         )}

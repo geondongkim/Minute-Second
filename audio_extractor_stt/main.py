@@ -10,7 +10,7 @@ from typing import AsyncGenerator
 
 import aiofiles
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -35,7 +35,11 @@ _jobs: dict[str, dict] = {}
 # ─── POST /api/jobs — 파일 업로드 + 처리 시작 ────────────────────────────────
 
 @app.post("/api/jobs")
-async def create_job(file: UploadFile = File(...)):
+async def create_job(
+    file: UploadFile = File(...),
+    meeting_type: str = Form("general"),
+    ref_text: str = Form(""),
+):
     suffix = os.path.splitext(file.filename or ".mp4")[1] or ".mp4"
     fd, tmp_path = tempfile.mkstemp(suffix=suffix)
     os.close(fd)
@@ -62,13 +66,13 @@ async def create_job(file: UploadFile = File(...)):
         "error": None,
     }
 
-    asyncio.create_task(_process_job(job_id, tmp_path, queue))
+    asyncio.create_task(_process_job(job_id, tmp_path, queue, meeting_type, ref_text))
     return {"job_id": job_id}
 
 
 # ─── SSE 처리 루프 ────────────────────────────────────────────────────────────
 
-async def _process_job(job_id: str, video_path: str, queue: asyncio.Queue) -> None:
+async def _process_job(job_id: str, video_path: str, queue: asyncio.Queue, meeting_type: str = "general", ref_text: str = "") -> None:
     from audio_extractor import async_extract_audio_from_video
     from stt_processor import process_audio
     from summarizer import summarize_text
@@ -104,7 +108,7 @@ async def _process_job(job_id: str, video_path: str, queue: asyncio.Queue) -> No
 
         push_progress(95, "AI 요약 생성 중", 10)
         push("요약 생성 중...")
-        summary = await asyncio.to_thread(summarize_text, combined_text)
+        summary = await asyncio.to_thread(summarize_text, combined_text, meeting_type, ref_text)
         push_progress(100, "완료", 100, 0)
 
         _jobs[job_id].update(

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import UploadZone from './components/UploadZone'
+import UploadZone, { type UploadParams } from './components/UploadZone'
 import ProgressLog from './components/ProgressLog'
 import ResultTabs from './components/ResultTabs'
 import { createJob, subscribeJobEvents, fetchJobResult, type JobResult, type ProgressEvent } from './api'
@@ -15,12 +15,15 @@ type AppState =
 export default function App() {
   const [state, setState] = useState<AppState>({ phase: 'idle' })
 
-  const handleFile = useCallback(async (file: File) => {
+  const handleFile = useCallback(async (params: UploadParams) => {
     setState({ phase: 'uploading', progress: 0 })
 
     try {
-      const jobId = await createJob(file, (pct) =>
-        setState({ phase: 'uploading', progress: pct }),
+      const jobId = await createJob(
+        params.file,
+        (pct) => setState({ phase: 'uploading', progress: pct }),
+        params.meetingType,
+        params.refText,
       )
 
       setState({ phase: 'processing', jobId, logs: [], progress: null })

@@ -24,6 +24,9 @@
 - **XHR 업로드**: `fetch`는 업로드 진행률 지원 안 함 → XMLHttpRequest 사용
 - **EventSource SSE**: `/api/jobs/{id}/events` 연결 → 실시간 로그 표시
 - **3-tab 결과**: 📌 회의 요약(ReactMarkdown), 🗣️ 화자별 스크립트, 📄 전체 원문
+- **회의 유형 선택**: UploadZone에서 10개 유형 선택 → 백엔드 summarizer에 전달
+- **참고자료 첨부**: MD/TXT 파일 첨부 → 요약 프롬프트에 포함
+- **다운로드 버튼**: 모든 탭에서 MD/TXT 파일로 저장 가능
 
 ---
 
