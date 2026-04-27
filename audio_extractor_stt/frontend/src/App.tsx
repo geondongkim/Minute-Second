@@ -12,8 +12,23 @@ type AppState =
   | { phase: 'done'; result: JobResult }
   | { phase: 'error'; message: string }
 
+const SESSION_KEY = 'minute_second_result'
+
+function loadSavedResult(): AppState {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY)
+    if (raw) {
+      const result = JSON.parse(raw)
+      return { phase: 'done', result }
+    }
+  } catch {
+    // 파싱 실패 시 무시
+  }
+  return { phase: 'idle' }
+}
+
 export default function App() {
-  const [state, setState] = useState<AppState>({ phase: 'idle' })
+  const [state, setState] = useState<AppState>(loadSavedResult)
 
   const handleFile = useCallback(async (params: UploadParams) => {
     setState({ phase: 'uploading', progress: 0 })
@@ -39,6 +54,7 @@ export default function App() {
         async () => {
           try {
             const result = await fetchJobResult(jobId)
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
             setState({ phase: 'done', result })
           } catch (e) {
             setState({ phase: 'error', message: String(e) })
@@ -90,7 +106,7 @@ export default function App() {
             <ResultTabs result={state.result} />
             <button
               className="btn-ghost reset-btn"
-              onClick={() => setState({ phase: 'idle' })}
+              onClick={() => { sessionStorage.removeItem(SESSION_KEY); setState({ phase: 'idle' }) }}
             >
               ← 새 파일 분석
             </button>
