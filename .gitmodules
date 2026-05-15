@@ -1,0 +1,12 @@
+[submodule "audio_extractor_stt"]
+	path = audio_extractor_stt
+	url = https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT.git
+	branch = main
+[submodule "lecture-slide-notes"]
+	path = lecture-slide-notes
+	url = https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes.git
+	branch = main
+[submodule "teams-caption-saver"]
+	path = teams-caption-saver
+	url = https://github.com/geondongkim/Minute-Second-Caption-Saver.git
+	branch = main

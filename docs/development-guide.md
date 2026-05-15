@@ -38,8 +38,11 @@ irm https://astral.sh/uv/install.ps1 | iex
 ## 2. 저장소 클론
 
 ```powershell
-git clone https://github.com/<owner>/Minute_Second.git
-cd Minute_Second
+git clone --recurse-submodules https://github.com/geondongkim/Minute-Second.git
+cd Minute-Second
+
+# 이미 clone한 경우
+git submodule update --init --recursive
 ```
 
 ---

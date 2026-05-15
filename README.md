@@ -4,9 +4,16 @@
 
 | 서비스 | 설명 | 문서 |
 |---|---|---|
-| `audio_extractor_stt/` | 동영상 업로드 → 오디오 추출 → STT + 화자 분리 → AI 요약 (FastAPI + React + WhisperX + Gemini) | [README](audio_extractor_stt/README.md) |
-| `teams-caption-saver/` | MS Teams 실시간 자막과 Vimeo 강의 자막 캡처 + AI 요약 Chrome/Edge 확장 (Manifest V3, 분리 후에도 slide-notes CLI와 호환) | [README](teams-caption-saver/README.md) |
-| `lecture-slide-notes/` | Vimeo/YouTube/로컬 강의 영상 → 슬라이드 PNG → searchable PDF + NotebookLM Markdown (CLI + MCP 확장 예정) | [README](lecture-slide-notes/README.md) |
+| `Minute-Second-Audio-Extractor-STT` | 동영상 업로드 → 오디오 추출 → STT + 화자 분리 → AI 요약 (FastAPI + React + WhisperX + Gemini) | [repo](https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT) |
+| `Minute-Second-Caption-Saver` | MS Teams 실시간 자막과 Vimeo 강의 자막 캡처 + AI 요약 Chrome/Edge 확장 (Manifest V3, slide-notes CLI와 호환) | [repo](https://github.com/geondongkim/Minute-Second-Caption-Saver) |
+| `Minute-Second-Lecture-Slide-Notes` | Vimeo/YouTube/로컬 강의 영상 → 슬라이드 PNG → searchable PDF + NotebookLM Markdown (CLI + MCP) | [repo](https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes) |
+
+현재 이 리포지토리는 umbrella 문서와 분리/호환 계약을 관리합니다. 세 프로젝트 폴더는 각 `Minute-Second-*` 리포지토리를 가리키는 git submodule입니다.
+
+```powershell
+git clone --recurse-submodules https://github.com/geondongkim/Minute-Second.git
+git submodule update --init --recursive
+```
 
 아키텍처 및 개발 가이드는 [`docs/`](docs/) 폴더를 참고하세요.
 

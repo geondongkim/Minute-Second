@@ -39,6 +39,15 @@ function Invoke-Git {
 
 Push-Location $root
 try {
+  if (Test-Path ".gitmodules") {
+    $submodulePaths = git config --file .gitmodules --get-regexp path
+    foreach ($repo in $repos) {
+      if ($submodulePaths -match [regex]::Escape($repo.Prefix)) {
+        throw "This is a one-time pre-submodule migration script. The umbrella repo already uses submodules; use tools/update-submodules.ps1 instead."
+      }
+    }
+  }
+
   $status = git status --porcelain
   if ($status) {
     throw "Commit or stash changes before splitting repositories. Split branches must be cut from a stable commit."
