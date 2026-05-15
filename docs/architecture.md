@@ -1,6 +1,6 @@
 # Minute Second — 시스템 아키텍처
 
-> 작성: 2026-04-27 | 기준: `audio_extractor_stt/` + `teams-caption-saver/` + `lecture-slide-notes/`
+> 작성: 2026-04-27 | 기준: `audio_extractor_stt/` + `script-saver/` + `lecture-slide-notes/`
 >
 > **범위**: 독립 서비스와 로컬 도구의 전체 데이터 흐름, 컴포넌트 역할, 통신 프로토콜
 
@@ -14,7 +14,7 @@ Minute Second 모노레포
 ├── audio_extractor_stt/       동영상 → STT → 회의록 웹 서비스
 │     └── FastAPI + React + Faster-Whisper + Gemini
 │
-├── teams-caption-saver/       Teams 자막 실시간 캡처 + AI 요약
+├── script-saver/              회의/강의 스크립트 캡처 + AI 요약
 │     └── Chrome Extension MV3 (팝업 + 사이드바 + 뷰어)
 │
 └── lecture-slide-notes/       Vimeo/YouTube/로컬 강의 영상 → 슬라이드 노트
@@ -167,7 +167,7 @@ audio_extractor_stt/
 
 ---
 
-## 4. teams-caption-saver — 전체 데이터 흐름
+## 4. script-saver — 전체 데이터 흐름
 
 ```
 Microsoft Teams 탭

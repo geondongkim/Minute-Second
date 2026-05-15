@@ -21,10 +21,10 @@ $repos = @(
     RemoteEnv = "MINUTE_SECOND_SLIDE_NOTES_REMOTE"
   },
   @{
-    Prefix = "teams-caption-saver"
-    Name = "Minute-Second-Caption-Saver"
-    Branch = "split/caption-saver"
-    RemoteEnv = "MINUTE_SECOND_CAPTION_REMOTE"
+    Prefix = "script-saver"
+    Name = "Minute-Second-Script-Saver"
+    Branch = "split/script-saver"
+    RemoteEnv = "MINUTE_SECOND_SCRIPT_SAVER_REMOTE"
   }
 )
 

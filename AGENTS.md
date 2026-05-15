@@ -7,7 +7,7 @@ This file gives Codex repository-wide guidance. Treat it as the project memory f
 Minute_Second contains two user-facing tools:
 
 - `audio_extractor_stt/`: FastAPI + React + WhisperX/Gemini service for extracting audio from videos, running STT/diarization, and generating meeting summaries.
-- `teams-caption-saver/`: Chrome/Edge Manifest V3 extension for capturing Microsoft Teams live captions, saving sessions, and generating AI summaries.
+- `script-saver/`: Chrome/Edge Manifest V3 extension for capturing meeting and lecture scripts, saving sessions, and generating AI summaries. Current adapters cover Microsoft Teams captions and Vimeo lecture captions.
 
 Supporting documentation lives in `docs/`. Generated or local-only data lives in `results/`, `videos/`, `.venv/`, `ref/`, and API-key `.env` files.
 
@@ -60,7 +60,7 @@ uv run python run_cli.py "videos/meeting.mp4"
 
 Chrome extension validation:
 
-- Load `teams-caption-saver/` as an unpacked extension from `chrome://extensions/`.
+- Load `script-saver/` as an unpacked extension from `chrome://extensions/`.
 - After editing extension files, reload the extension and test against Teams pages covered by `manifest.json`.
 
 ## Python Rules
@@ -82,7 +82,7 @@ Chrome extension validation:
 
 ## Browser Extension Rules
 
-- Maintain Manifest V3 compatibility and the permissions already declared in `teams-caption-saver/manifest.json`.
+- Maintain Manifest V3 compatibility and the permissions already declared in `script-saver/manifest.json`.
 - Keep Teams DOM capture logic in `content_script.js`.
 - Keep persistence/background coordination in `service_worker.js`.
 - Keep popup/side panel behavior in `popup.js`, and detailed transcript/AI summary behavior in `viewer.js`.

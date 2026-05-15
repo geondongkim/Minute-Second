@@ -6,7 +6,7 @@
 |---|---|---|---|
 | `Minute-Second-Audio-Extractor-STT` | `audio_extractor_stt/` | `https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT` | 동영상 업로드, STT, 화자 분리, 회의록/요약 웹 서비스 |
 | `Minute-Second-Lecture-Slide-Notes` | `lecture-slide-notes/` | `https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes` | Vimeo/YouTube/로컬 강의 영상에서 슬라이드 PDF와 NotebookLM Markdown 생성 |
-| `Minute-Second-Caption-Saver` | `teams-caption-saver/` | `https://github.com/geondongkim/Minute-Second-Caption-Saver` | Teams/Vimeo 브라우저 캡션 캡처 확장 |
+| `Minute-Second-Script-Saver` | `script-saver/` | `https://github.com/geondongkim/Minute-Second-Script-Saver` | 회의/강의 스크립트 캡처 확장(현재 Teams/Vimeo 지원) |
 
 ## 현재 상태
 
@@ -42,9 +42,9 @@ git submodule update --init --recursive
 
 ## 호환 계약
 
-### Caption Saver -> Lecture Slide Notes
+### Script Saver -> Lecture Slide Notes
 
-브라우저 확장은 Vimeo/HLS 상태를 감지한 뒤 로컬 PowerShell 명령을 복사합니다. 분리 후에도 아래 CLI 계약만 유지하면 됩니다.
+브라우저 확장은 강의 영상의 HLS/manifest 상태를 감지한 뒤 로컬 PowerShell 명령을 복사합니다. 분리 후에도 아래 CLI 계약만 유지하면 됩니다.
 
 ```powershell
 uv run --project <lecture-slide-notes-repo> lecture-slide-notes process-url <url> --output-root <output-root> [--referer <lesson-url>] [--title <title>]
@@ -83,7 +83,7 @@ uv run --project <lecture-slide-notes-repo> lecture-slide-notes process-video <v
 ```powershell
 $env:MINUTE_SECOND_AUDIO_REMOTE = "https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT.git"
 $env:MINUTE_SECOND_SLIDE_NOTES_REMOTE = "https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes.git"
-$env:MINUTE_SECOND_CAPTION_REMOTE = "https://github.com/geondongkim/Minute-Second-Caption-Saver.git"
+$env:MINUTE_SECOND_SCRIPT_SAVER_REMOTE = "https://github.com/geondongkim/Minute-Second-Script-Saver.git"
 .\tools\split-repositories.ps1 -Recreate -Push
 ```
 

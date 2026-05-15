@@ -1,6 +1,6 @@
 # 개발 환경 설정 및 실행 가이드
 
-> 작성: 2026-04-27 | 기준: `audio_extractor_stt/pyproject.toml`, `audio_extractor_stt/frontend/`, `teams-caption-saver/manifest.json`, `lecture-slide-notes/pyproject.toml`
+> 작성: 2026-04-27 | 기준: `audio_extractor_stt/pyproject.toml`, `audio_extractor_stt/frontend/`, `script-saver/manifest.json`, `lecture-slide-notes/pyproject.toml`
 >
 > **범위**: 로컬 개발 환경 구성, 서비스 실행, CLI 사용, 프로덕션 빌드, 확장 로드
 
@@ -226,14 +226,14 @@ SPEAKER_00:
 
 ---
 
-## 8. teams-caption-saver — Chrome 확장 로드
+## 8. script-saver — Chrome 확장 로드
 
 ### 8-1. 개발 모드 로드
 
 1. Chrome에서 `chrome://extensions/` 열기
 2. 우상단 **"개발자 모드"** 토글 활성화
 3. **"압축 해제된 확장 프로그램 로드"** 클릭
-4. `Minute_Second/teams-caption-saver/` 폴더 선택
+4. `Minute_Second/script-saver/` 폴더 선택
 
 > 코드 변경 후 `chrome://extensions/`에서 새로고침 버튼(↺) 클릭 필요
 
@@ -266,7 +266,7 @@ Minute_Second/
 ├── docs/                         문서
 │     ├── architecture.md         전체 시스템 아키텍처
 │     ├── audio-extractor-stt.md  웹 서비스 상세 설계
-│     ├── teams-caption-saver.md  Chrome 확장 상세 설계
+│     ├── script-saver.md         Chrome 확장 상세 설계
 │     ├── lecture-slide-notes.md  강의 슬라이드 노트 생성기 설계
 │     └── development-guide.md    개발 환경 설정 (이 문서)
 │
@@ -302,7 +302,7 @@ Minute_Second/
 │     ├── videos/                 동영상 파일 (gitignore)
 │     └── results/                CLI 출력 결과 (gitignore)
 │
-├── teams-caption-saver/          Chrome Extension MV3
+├── script-saver/                 Chrome Extension MV3
 │     ├── manifest.json
 │     ├── content_script.js
 │     ├── service_worker.js
