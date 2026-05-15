@@ -4,12 +4,13 @@ This file gives Codex repository-wide guidance. Treat it as the project memory f
 
 ## Repository Overview
 
-Minute_Second contains two user-facing tools:
+Minute_Second is a public gateway repository and submodule workspace for three public project repositories:
 
 - `audio_extractor_stt/`: FastAPI + React + WhisperX/Gemini service for extracting audio from videos, running STT/diarization, and generating meeting summaries.
-- `script-saver/`: Chrome/Edge Manifest V3 extension for capturing meeting and lecture scripts, saving sessions, and generating AI summaries. Current adapters cover Microsoft Teams captions and Vimeo lecture captions.
+- `script-saver/`: Chrome/Edge Manifest V3 extension for capturing meeting and lecture scripts, saving sessions, generating AI summaries, and handing lecture URLs to the slide-notes CLI.
+- `lecture-slide-notes/`: Python/uv CLI package for turning Vimeo, YouTube, and local lecture videos into slide PNGs, searchable PDFs, OCR text, and NotebookLM-ready Markdown.
 
-Supporting documentation lives in `docs/`. Generated or local-only data lives in `results/`, `videos/`, `.venv/`, `ref/`, and API-key `.env` files.
+This root repository keeps the public landing page, README gateway, lightweight `docs/repository-map.md`, submodule pointers, and orchestration scripts. Detailed product documentation lives inside each project repository. Generated or local-only data lives in `repo/`, `results/`, `videos/`, `.venv/`, `ref/`, and API-key `.env` files.
 
 ## Operating Workflow
 
@@ -23,6 +24,13 @@ Use the same loop for non-trivial work: research the relevant files, plan the sm
 - If Korean text appears garbled in PowerShell output, assume it is an encoding display issue and inspect the file with an editor or UTF-8-aware tooling before rewriting content.
 
 ## Commands
+
+Root workspace:
+
+```powershell
+git submodule update --init --recursive
+.\tools\update-submodules.ps1
+```
 
 Backend service:
 
@@ -63,6 +71,14 @@ Chrome extension validation:
 - Load `script-saver/` as an unpacked extension from `chrome://extensions/`.
 - After editing extension files, reload the extension and test against Teams pages covered by `manifest.json`.
 
+Lecture slide notes CLI:
+
+```powershell
+cd lecture-slide-notes
+uv run lecture-slide-notes doctor
+uv run lecture-slide-notes process-url "https://player.vimeo.com/video/..." --out "repo/slidenote_video_exports/example"
+```
+
 ## Python Rules
 
 - Target Python 3.10+.
@@ -91,7 +107,8 @@ Chrome extension validation:
 
 ## Documentation Rules
 
-- Update `docs/` when changing setup, architecture, user flows, or externally visible behavior.
+- Update the relevant project README/docs when changing setup, architecture, user flows, or externally visible behavior.
+- Keep root docs lightweight; use `docs/repository-map.md` for cross-repository orientation only.
 - Keep README and docs concise, command-focused, and current.
 - Prefer UTF-8 text. Avoid rewriting Korean documentation unless the task is specifically about documentation or encoding cleanup.
 

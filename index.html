@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minute Second</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --ink: #17191f;
+      --muted: #5f6673;
+      --line: #d9dde5;
+      --panel: #ffffff;
+      --blue: #2563eb;
+      --green: #147d64;
+      --rose: #b4234b;
+      --violet: #7048e8;
+      --dark: #111827;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+
+    .hero {
+      min-height: 520px;
+      display: grid;
+      align-items: end;
+      background:
+        linear-gradient(90deg, rgba(17, 24, 39, .92), rgba(17, 24, 39, .62), rgba(17, 24, 39, .22)),
+        url("audio_extractor_stt/frontend/src/assets/hero.png") right 12% center / 360px auto no-repeat,
+        #111827;
+      color: #fff;
+    }
+
+    .hero-inner,
+    .section-inner {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero-inner { padding: 72px 0 64px; }
+
+    .eyebrow {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #9cc4ff;
+      margin: 0 0 12px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 84px);
+      line-height: 1;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      margin: 20px 0 0;
+      color: #d8dee9;
+      font-size: 19px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+
+    .button.primary { background: #fff; color: var(--dark); }
+
+    section { padding: 54px 0; }
+
+    .section-title {
+      font-size: 28px;
+      margin: 0 0 18px;
+      letter-spacing: 0;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .project-card::before {
+      content: "";
+      display: block;
+      width: 48px;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--blue);
+    }
+
+    .project-card.script::before { background: var(--green); }
+    .project-card.slides::before { background: var(--rose); }
+
+    .project-card h2 { margin: 0; font-size: 21px; letter-spacing: 0; }
+    .project-card p { margin: 0; color: var(--muted); }
+
+    .project-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #303642;
+    }
+
+    .card-links {
+      margin-top: auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .card-links a {
+      color: var(--blue);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .map {
+      background: #e9edf4;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .flow-step {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 130px;
+    }
+
+    .flow-step strong { display: block; margin-bottom: 8px; }
+    .flow-step span { color: var(--muted); }
+
+    .workspace code {
+      display: block;
+      overflow-x: auto;
+      background: #111827;
+      color: #d8dee9;
+      padding: 16px;
+      border-radius: 8px;
+      white-space: pre;
+    }
+
+    footer {
+      padding: 28px 0;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 820px) {
+      .hero { min-height: 480px; background-size: 240px auto; background-position: right -24px top 48px; }
+      .project-grid, .flow { grid-template-columns: 1fr; }
+      .hero-copy { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Public Project Gateway</p>
+      <h1>Minute Second</h1>
+      <p class="hero-copy">회의와 강의에서 나오는 음성, 스크립트, 슬라이드를 저장 가능한 자료로 바꾸는 세 개의 도구입니다.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT">Audio Extractor STT</a>
+        <a class="button" href="https://github.com/geondongkim/Minute-Second-Script-Saver">Script Saver</a>
+        <a class="button" href="https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes">Lecture Slide Notes</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-inner">
+        <h2 class="section-title">Projects</h2>
+        <div class="project-grid">
+          <article class="project-card audio">
+            <h2>Audio Extractor STT</h2>
+            <p>동영상 파일을 회의록으로 바꾸는 FastAPI + React 서비스입니다.</p>
+            <ul>
+              <li>오디오 추출</li>
+              <li>한국어 STT와 화자 분리</li>
+              <li>Gemini 기반 회의 요약</li>
+            </ul>
+            <div class="card-links">
+              <a href="https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT">Repository</a>
+              <a href="audio_extractor_stt/README.md">Local README</a>
+            </div>
+          </article>
+
+          <article class="project-card script">
+            <h2>Script Saver</h2>
+            <p>브라우저에서 회의와 강의 스크립트를 저장하고 요약하는 Manifest V3 확장입니다.</p>
+            <ul>
+              <li>Teams 캡션 저장</li>
+              <li>Vimeo 강의 자막 수집</li>
+              <li>슬라이드 노트 CLI 명령 복사</li>
+            </ul>
+            <div class="card-links">
+              <a href="https://github.com/geondongkim/Minute-Second-Script-Saver">Repository</a>
+              <a href="script-saver/README.md">Local README</a>
+            </div>
+          </article>
+
+          <article class="project-card slides">
+            <h2>Lecture Slide Notes</h2>
+            <p>강의 영상을 슬라이드 이미지, searchable PDF, NotebookLM Markdown으로 변환합니다.</p>
+            <ul>
+              <li>Vimeo, YouTube, 로컬 영상</li>
+              <li>FFmpeg 기반 슬라이드 감지</li>
+              <li>OCR과 Gemini 보정 경로</li>
+            </ul>
+            <div class="card-links">
+              <a href="https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes">Repository</a>
+              <a href="lecture-slide-notes/README.md">Local README</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="map">
+      <div class="section-inner">
+        <h2 class="section-title">Architecture Map</h2>
+        <div class="flow">
+          <div class="flow-step"><strong>1. Capture</strong><span>Script Saver saves browser captions and lecture subtitles.</span></div>
+          <div class="flow-step"><strong>2. Transcribe</strong><span>Audio Extractor STT processes uploaded media into meeting notes.</span></div>
+          <div class="flow-step"><strong>3. Study</strong><span>Lecture Slide Notes converts videos into slide PDFs and Markdown.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="section-inner">
+        <h2 class="section-title">Workspace</h2>
+        <code>git clone --recurse-submodules https://github.com/geondongkim/Minute-Second.git
+cd Minute-Second
+git submodule update --init --recursive
+.\tools\update-submodules.ps1</code>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="section-inner">Minute Second is a gateway repository. Product code and detailed docs live in the public project repositories.</div>
+  </footer>
+</body>
+</html>

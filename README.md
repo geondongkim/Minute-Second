@@ -1,28 +1,58 @@
 # Minute Second
 
-> AI 기반 회의록 자동화 도구 모음 — 세 개의 독립 프로젝트와 umbrella 문서로 구성
+> 회의와 강의에서 생기는 음성, 스크립트, 슬라이드를 저장하고 정리하는 public project gateway.
 
-| 서비스 | 설명 | 문서 |
+Minute Second는 세 개의 독립 public repository로 나뉘어 있습니다. 이 root repository는 각 프로젝트로 들어가는 랜딩 페이지이자, submodule 기반 통합 workspace입니다.
+
+## Projects
+
+| Project | Use It For | Public Repo |
 |---|---|---|
-| `Minute-Second-Audio-Extractor-STT` | 동영상 업로드 → 오디오 추출 → STT + 화자 분리 → AI 요약 (FastAPI + React + WhisperX + Gemini) | [repo](https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT) |
-| `Minute-Second-Script-Saver` | 회의/강의 스크립트 캡처 + AI 요약 Chrome/Edge 확장 (Teams와 Vimeo 현재 지원, slide-notes CLI와 호환) | [repo](https://github.com/geondongkim/Minute-Second-Script-Saver) |
-| `Minute-Second-Lecture-Slide-Notes` | Vimeo/YouTube/로컬 강의 영상 → 슬라이드 PNG → searchable PDF + NotebookLM Markdown (CLI + MCP) | [repo](https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes) |
+| `Minute-Second-Audio-Extractor-STT` | 동영상 업로드, 오디오 추출, 한국어 STT, 화자 분리, AI 회의록 생성 | [GitHub](https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT) |
+| `Minute-Second-Script-Saver` | Teams 회의 캡션과 Vimeo 강의 자막 저장, AI 요약, slide-notes 명령 복사 | [GitHub](https://github.com/geondongkim/Minute-Second-Script-Saver) |
+| `Minute-Second-Lecture-Slide-Notes` | Vimeo, YouTube, 로컬 강의 영상에서 슬라이드 PNG, searchable PDF, NotebookLM Markdown 생성 | [GitHub](https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes) |
 
-현재 이 리포지토리는 umbrella 문서와 분리/호환 계약을 관리합니다. 세 프로젝트 폴더는 각 `Minute-Second-*` 리포지토리를 가리키는 git submodule입니다.
+## Routes
+
+| Goal | Start Here |
+|---|---|
+| 동영상 파일을 회의록으로 만들기 | `Minute-Second-Audio-Extractor-STT` |
+| 브라우저에서 회의/강의 스크립트를 저장하기 | `Minute-Second-Script-Saver` |
+| 강의 영상을 PDF/Markdown 학습 자료로 바꾸기 | `Minute-Second-Lecture-Slide-Notes` |
+| 세 프로젝트를 함께 보고 연동 흐름을 확인하기 | 이 repository의 submodules |
+
+## Architecture Map
+
+```text
+Minute-Second
+  -> Audio Extractor STT
+	  video file -> audio -> STT/diarization -> AI meeting notes
+
+  -> Script Saver
+	  browser captions/subtitles -> saved sessions -> AI summaries
+												-> lecture-slide-notes CLI commands
+
+  -> Lecture Slide Notes
+	  Vimeo/YouTube/local video -> slide PNGs -> searchable PDF + NotebookLM Markdown
+```
+
+## Local Workspace
 
 ```powershell
 git clone --recurse-submodules https://github.com/geondongkim/Minute-Second.git
+cd Minute-Second
 git submodule update --init --recursive
 ```
 
-아키텍처 및 개발 가이드는 [`docs/`](docs/) 폴더를 참고하세요.
+To refresh all project pointers:
 
-| 문서 | 내용 |
-|---|---|
-| [docs/architecture.md](docs/architecture.md) | 전체 시스템 아키텍처 및 데이터 흐름 |
-| [docs/audio-extractor-stt.md](docs/audio-extractor-stt.md) | FastAPI + React 서비스 상세 설계 |
-| [docs/script-saver.md](docs/script-saver.md) | Chrome 확장 상세 설계 |
-| [docs/lecture-slide-notes.md](docs/lecture-slide-notes.md) | Vimeo/YouTube 강의 슬라이드 노트 생성기 설계 |
-| [docs/repository-split.md](docs/repository-split.md) | 독립 리포지토리 분리 계획과 호환 계약 |
-| [docs/development-guide.md](docs/development-guide.md) | 개발 환경 설정 및 실행 가이드 |
+```powershell
+.\tools\update-submodules.ps1
+```
+
+The detailed docs live inside each public project repository. This root keeps only the gateway map, submodule pointers, and lightweight orchestration helpers.
+
+Open [index.html](index.html) for the static landing page.
+
+More root context: [docs/repository-map.md](docs/repository-map.md)
 
