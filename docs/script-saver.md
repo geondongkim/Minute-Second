@@ -68,9 +68,10 @@ script-saver/
 │     주입 시점: document_idle
 ├── vimeo_content_script.js Vimeo TextTrack 자막 수집 + 중단/재수집
 │     주입 대상: player.vimeo.com/video/* (all_frames: true)
+│     TextTrack cue 로딩 실패 시 service_worker.js에 VTT fallback 요청
 │
 ├── service_worker.js      백그라운드 이벤트 처리
-│     저장, 알람, 다운로드, 히스토리, 뷰어 열기
+│     저장, 알람, 다운로드, 히스토리, 뷰어 열기, Vimeo VTT fallback 파싱
 │
 ├── popup.html             팝업 UI (4탭, 340px, Catppuccin dark)
 ├── sidepanel.html         사이드바 UI (4탭, 가변 폭, Catppuccin dark)
