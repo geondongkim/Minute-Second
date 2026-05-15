@@ -1,8 +1,8 @@
 # Minute Second — 시스템 아키텍처
 
-> 작성: 2026-04-27 | 기준: `audio_extractor_stt/` + `teams-caption-saver/`
+> 작성: 2026-04-27 | 기준: `audio_extractor_stt/` + `teams-caption-saver/` + `lecture-slide-notes/`
 >
-> **범위**: 두 독립 서비스의 전체 데이터 흐름, 컴포넌트 역할, 통신 프로토콜
+> **범위**: 독립 서비스와 로컬 도구의 전체 데이터 흐름, 컴포넌트 역할, 통신 프로토콜
 
 ---
 
@@ -14,11 +14,40 @@ Minute Second 모노레포
 ├── audio_extractor_stt/       동영상 → STT → 회의록 웹 서비스
 │     └── FastAPI + React + Faster-Whisper + Gemini
 │
-└── teams-caption-saver/       Teams 자막 실시간 캡처 + AI 요약
-      └── Chrome Extension MV3 (팝업 + 사이드바 + 뷰어)
+├── teams-caption-saver/       Teams 자막 실시간 캡처 + AI 요약
+│     └── Chrome Extension MV3 (팝업 + 사이드바 + 뷰어)
+│
+└── lecture-slide-notes/       Vimeo/YouTube/로컬 강의 영상 → 슬라이드 노트
+      └── CLI + yt-dlp + FFmpeg + OCR + Gemini + MCP 확장 골격
 ```
 
-두 서비스는 **공유 인프라 없이 독립 실행**되며, 공통 개념(회의 유형별 프롬프트, 3섹션 결과 포맷)만 공유합니다.
+각 도구는 **공유 인프라 없이 독립 실행**되며, 공통 개념(동영상 입력, Gemini 기반 후처리, Markdown 결과 포맷)만 공유합니다.
+
+### 1-1. lecture-slide-notes — 전체 데이터 흐름
+
+```
+강의 페이지 URL / Vimeo player URL / YouTube URL / 로컬 동영상
+       │
+       ▼
+SourceResolver
+       │     └─ Vimeo iframe, YouTube iframe, referer, direct manifest 후보 정리
+       ▼
+DownloadManager (yt-dlp)
+       │     └─ Vimeo player URL 또는 YouTube watch URL + optional referer/cookies
+       ▼
+FFmpeg frame sampling
+       │
+       ▼
+Stable slide detector
+       │     └─ transition frame 제거, min-gap, dedupe, contact sheet
+       ▼
+slides/ + slides_pdf/
+       │
+       ├─ OCR adapter → slide별 원문 텍스트
+       ├─ optional Gemini correction → NotebookLM용 구조화 보정
+       ├─ Markdown builder → *_notes.md
+       └─ PDF builder → searchable PDF
+```
 
 ---
 
@@ -272,7 +301,7 @@ sidepanel.html ── <script src="popup.js"> ─┤ 동일 스크립트
 
 ## 6. 공통 설계 패턴 — 회의 유형별 AI 요약
 
-두 서비스 모두 동일한 10개 회의 유형과 3섹션 출력 구조를 사용합니다.
+회의록/캡션 계열 서비스는 동일한 10개 회의 유형과 3섹션 출력 구조를 사용합니다.
 
 ### 6-1. 회의 유형 (10종)
 

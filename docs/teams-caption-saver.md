@@ -2,13 +2,15 @@
 
 > 작성: 2026-04-27 | 버전: 2.0.0 | 기준: `manifest.json`, `content_script.js`, `vimeo_content_script.js`, `service_worker.js`, `popup.js`
 >
-> **범위**: Manifest V3 구조, Teams/Vimeo 자막 감지 전략, 저장 파이프라인, 사이드 패널 연동, AI 요약
+> **범위**: Manifest V3 구조, Teams/Vimeo 자막 감지 전략, 저장 파이프라인, 사이드 패널 연동, AI 요약, `lecture-slide-notes` CLI 호환
 
 ---
 
 ## 1. 확장 개요
 
 MS Teams 화상회의 중 라이브 캡션(Live Caption) 텍스트와 Vimeo 강의 자막을 캡처하고, AI로 요약하여 회의록/강의 노트를 생성하는 Chrome/Edge 확장입니다.
+
+리포지토리 분리 후에도 슬라이드 PDF/Markdown 생성은 `Minute-Second-Lecture-Slide-Notes`의 공개 CLI 계약만 호출합니다. 확장 내부에서 다른 프로젝트의 Python 파일을 직접 import하거나 실행하지 않습니다.
 
 **지원 환경:**
 - Chrome 114+ (Side Panel API 요구사항)

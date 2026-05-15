@@ -1,6 +1,6 @@
 # 개발 환경 설정 및 실행 가이드
 
-> 작성: 2026-04-27 | 기준: `audio_extractor_stt/pyproject.toml`, `audio_extractor_stt/frontend/`, `teams-caption-saver/manifest.json`
+> 작성: 2026-04-27 | 기준: `audio_extractor_stt/pyproject.toml`, `audio_extractor_stt/frontend/`, `teams-caption-saver/manifest.json`, `lecture-slide-notes/pyproject.toml`
 >
 > **범위**: 로컬 개발 환경 구성, 서비스 실행, CLI 사용, 프로덕션 빌드, 확장 로드
 
@@ -15,6 +15,7 @@
 | Node.js | 18+ | `node --version` |
 | npm | 9+ | `npm --version` |
 | FFmpeg | 임의 | `ffmpeg -version` |
+| Tesseract OCR | 선택 | `tesseract --version` |
 | Chrome | 114+ | 브라우저 버전 확인 (사이드 패널용) |
 
 **FFmpeg 설치 (Windows):**
@@ -43,9 +44,42 @@ cd Minute_Second
 
 ---
 
-## 3. audio_extractor_stt — 백엔드 설정
+## 3. lecture-slide-notes — 강의 슬라이드 노트 CLI
 
 ### 3-1. 의존성 설치
+
+```powershell
+cd lecture-slide-notes
+uv sync --extra ocr --extra mcp
+```
+
+### 3-2. 환경 점검
+
+```powershell
+uv run lecture-slide-notes doctor
+```
+
+### 3-3. 로컬 동영상 처리
+
+```powershell
+uv run lecture-slide-notes process-video ..\videos\lecture.mp4 --output ..\outputs\lecture
+```
+
+### 3-4. Vimeo/YouTube URL 처리
+
+```powershell
+uv run lecture-slide-notes process-url "https://player.vimeo.com/video/<id>" --referer "https://academy.example/lesson" --output-root ..\outputs
+
+uv run lecture-slide-notes process-url "https://www.youtube.com/watch?v=<id>" --output-root ..\outputs
+```
+
+로그인 강의 사이트와 일부 YouTube 계정 제한 영상은 비밀번호를 저장하지 않고 `--cookies-from-browser chrome` 또는 `--cookies-from-browser edge`를 사용합니다.
+
+---
+
+## 4. audio_extractor_stt — 백엔드 설정
+
+### 4-1. 의존성 설치
 
 ```powershell
 cd audio_extractor_stt
@@ -56,7 +90,7 @@ uv sync
 
 > **소요 시간:** 첫 실행 시 약 5~15분 (PyTorch, faster-whisper 등 대용량 패키지)
 
-### 3-2. 환경 변수 설정
+### 4-2. 환경 변수 설정
 
 `audio_extractor_stt/.env` 파일 생성:
 
@@ -76,9 +110,9 @@ HF_TOKEN=hf_...
 
 ---
 
-## 4. audio_extractor_stt — 개발 서버 실행
+## 5. audio_extractor_stt — 개발 서버 실행
 
-### 4-1. 백엔드 (FastAPI)
+### 5-1. 백엔드 (FastAPI)
 
 ```powershell
 # audio_extractor_stt/ 디렉터리에서
@@ -92,7 +126,7 @@ uv run uvicorn main:app --reload --port 8000
 
 API 문서: `http://localhost:8000/docs` (Swagger UI 자동 생성)
 
-### 4-2. 프론트엔드 (React + Vite)
+### 5-2. 프론트엔드 (React + Vite)
 
 ```powershell
 # audio_extractor_stt/frontend/ 디렉터리에서
@@ -108,7 +142,7 @@ npm run dev      # → http://localhost:5173
 
 ---
 
-## 5. audio_extractor_stt — 프로덕션 빌드
+## 6. audio_extractor_stt — 프로덕션 빌드
 
 단일 서버로 React SPA + FastAPI를 함께 서빙합니다.
 
@@ -127,11 +161,11 @@ uv run uvicorn main:app --port 8000
 
 ---
 
-## 6. audio_extractor_stt — CLI 사용법 (`run_cli.py`)
+## 7. audio_extractor_stt — CLI 사용법 (`run_cli.py`)
 
 서버 없이 터미널에서 직접 동영상을 처리할 때 사용합니다.
 
-### 6-1. 기본 사용법
+### 7-1. 기본 사용법
 
 ```powershell
 cd audio_extractor_stt
@@ -143,7 +177,7 @@ uv run python run_cli.py "videos/회의.mp4"
 uv run python run_cli.py "videos/회의.mp4" --output-dir "output/"
 ```
 
-### 6-2. 옵션
+### 7-2. 옵션
 
 | 옵션 | 기본값 | 설명 |
 |---|---|---|
@@ -151,7 +185,7 @@ uv run python run_cli.py "videos/회의.mp4" --output-dir "output/"
 | `--output-dir` | `results/` | 결과 Markdown 저장 디렉터리 |
 | `--meeting-type` | `general` | 회의 유형 키 (10종) |
 
-### 6-3. 출력 형식
+### 7-3. 출력 형식
 
 ```
 results/
@@ -181,7 +215,7 @@ SPEAKER_00:
 [00:00:01] 안녕하세요...
 ```
 
-### 6-4. 터미널 게이지 표시
+### 7-4. 터미널 게이지 표시
 
 ```
 [████████████░░░░░░░░░░░░░░░░░░] 40%  화자 분리 중 (60%)  ETA 2분 30초
@@ -189,9 +223,9 @@ SPEAKER_00:
 
 ---
 
-## 7. teams-caption-saver — Chrome 확장 로드
+## 8. teams-caption-saver — Chrome 확장 로드
 
-### 7-1. 개발 모드 로드
+### 8-1. 개발 모드 로드
 
 1. Chrome에서 `chrome://extensions/` 열기
 2. 우상단 **"개발자 모드"** 토글 활성화
@@ -200,7 +234,7 @@ SPEAKER_00:
 
 > 코드 변경 후 `chrome://extensions/`에서 새로고침 버튼(↺) 클릭 필요
 
-### 7-2. 사이드바 열기 테스트
+### 8-2. 사이드바 열기 테스트
 
 1. `teams.microsoft.com` 또는 Teams 회의 탭 활성화
 2. 확장 팝업 열기 → 우상단 "↗ 사이드바" 버튼 클릭
@@ -208,7 +242,7 @@ SPEAKER_00:
 
 > Chrome 113 이하에서는 `chrome.sidePanel` API 미지원으로 콘솔에 오류 출력
 
-### 7-3. AI 요약 설정
+### 8-3. AI 요약 설정
 
 1. 팝업 또는 사이드바 → **AI 요약 탭**
 2. AI 제공자 선택 (Gemini / OpenAI)
@@ -217,7 +251,7 @@ SPEAKER_00:
 
 ---
 
-## 8. 프로젝트 구조 전체
+## 9. 프로젝트 구조 전체
 
 ```
 Minute_Second/
@@ -230,7 +264,22 @@ Minute_Second/
 │     ├── architecture.md         전체 시스템 아키텍처
 │     ├── audio-extractor-stt.md  웹 서비스 상세 설계
 │     ├── teams-caption-saver.md  Chrome 확장 상세 설계
+│     ├── lecture-slide-notes.md  강의 슬라이드 노트 생성기 설계
 │     └── development-guide.md    개발 환경 설정 (이 문서)
+│
+├── lecture-slide-notes/          Vimeo/YouTube/로컬 강의 영상 → 슬라이드 PDF + Markdown
+│     ├── pyproject.toml          uv 패키지 관리
+│     ├── README.md               CLI/MCP 사용법
+│     ├── src/lecture_slide_notes/
+│     │     ├── cli.py            CLI 진입점
+│     │     ├── sources.py        Vimeo/YouTube/course/local source resolver
+│     │     ├── downloader.py     yt-dlp 다운로드/metadata 추출
+│     │     ├── slides.py         FFmpeg sampling + stable slide detection
+│     │     ├── ocr.py            OCR adapter
+│     │     ├── markdown.py       NotebookLM Markdown 생성
+│     │     ├── pdf.py            searchable PDF 생성
+│     │     └── mcp_server.py     MCP 서버 골격
+│     └── tests/
 │
 ├── audio_extractor_stt/          FastAPI + React 웹 서비스
 │     ├── .env                    환경 변수 (MINUTE_SECOND_API_KEY, HF_TOKEN)
@@ -267,7 +316,7 @@ Minute_Second/
 
 ---
 
-## 9. 자주 발생하는 문제
+## 10. 자주 발생하는 문제
 
 ### Q1. `uv sync` 중 `torchcodec` 설치 오류 (Windows)
 
