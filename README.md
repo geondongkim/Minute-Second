@@ -43,4 +43,19 @@ REPOS
 ## 충돌 방지 설정
 
 - 루트 `.gitignore`는 `external/`, `node_modules/`, `.venv/`, `.pytest_cache/`, `dist/`, `build/` 같은 로컬 산출물을 무시합니다.
+- `outputs/`는 영상 처리 결과, PNG, PDF, NotebookLM용 Markdown이 쌓이는 작업 폴더로 간주해 Git 추적에서 제외합니다.
 - 루트 `pytest.ini`는 `external/`을 `norecursedirs`에 포함해 하위 프로젝트 테스트가 루트 pytest 수집에 섞이지 않도록 합니다.
+
+## NotebookLM 자료 생성 개선 방향
+
+오늘 작업 기준으로 권장 흐름은 `Lecture Slide Notes`에서 고화질 PNG와 searchable PDF를 먼저 만들고, 한글 UI/슬라이드 OCR은 Tesseract 보정이 아니라 Gemini 이미지 OCR 모드로 직접 처리하는 방식입니다.
+
+```bash
+cd external/Minute-Second-Lecture-Slide-Notes
+uv run lecture-slide-notes process-url "https://www.youtube.com/watch?v=<id>" \
+  --output-root ../../outputs \
+  --ocr-engine gemini \
+  --gemini-request-delay 3
+```
+
+Gemini API 키는 환경 변수 대신 로컬 파일 `~/.config/minute-second/google_api_key`에 둘 수 있습니다. 이 파일과 `outputs/`는 저장소에 커밋하지 않습니다.
