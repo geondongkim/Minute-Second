@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minute Second</title>
+    <meta
+      name="description"
+      content="Minute Second is a toolkit for capturing captions, transcribing videos, and creating lecture slide notes."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Minute Second home">
+        <span class="brand-mark" aria-hidden="true">MS</span>
+        <span>Minute Second</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#workflow">Workflow</a>
+        <a href="#projects">Projects</a>
+        <a href="#setup">Setup</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-shade"></div>
+        <img
+          class="hero-art"
+          src="assets/audio-extractor-workflow.png"
+          alt="Minute Second processing layer visual"
+        >
+        <div class="hero-content">
+          <p class="eyebrow">Caption, STT, slide notes</p>
+          <h1 id="hero-title">Minute Second</h1>
+          <p class="hero-copy">
+            회의와 강의의 순간을 캡처하고, 전사하고, 다시 공부할 수 있는 자료로 정리하는
+            세 가지 로컬 도구 모음입니다.
+          </p>
+          <div class="hero-actions" aria-label="Main actions">
+            <a class="button button-primary" href="#projects">프로젝트 보기</a>
+            <a class="button button-secondary" href="https://github.com/geondongkim/Minute-Second">GitHub</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section intro" id="workflow" aria-labelledby="workflow-title">
+        <div class="section-heading">
+          <p class="eyebrow">Workflow</p>
+          <h2 id="workflow-title">기록을 자료로 바꾸는 세 단계</h2>
+        </div>
+        <div class="flow" aria-label="Minute Second workflow">
+          <article class="flow-step">
+            <span class="step-index">01</span>
+            <h3>Capture</h3>
+            <p>Teams와 Vimeo 자막을 브라우저에서 저장하고 AI 요약에 바로 연결합니다.</p>
+          </article>
+          <article class="flow-step">
+            <span class="step-index">02</span>
+            <h3>Transcribe</h3>
+            <p>동영상 파일에서 오디오를 추출하고 STT, 화자 분리, 회의록 생성을 처리합니다.</p>
+          </article>
+          <article class="flow-step">
+            <span class="step-index">03</span>
+            <h3>Study Notes</h3>
+            <p>강의 영상에서 슬라이드를 감지해 searchable PDF와 NotebookLM용 Markdown을 만듭니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section projects-section" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2 id="projects-title">세 프로젝트</h2>
+        </div>
+        <div class="project-grid">
+          <article class="project-card project-card-accent-a">
+            <div class="project-media icon-media">
+              <img src="assets/script-saver-icon.png" alt="Script Saver extension icon">
+            </div>
+            <div class="project-body">
+              <p class="project-type">Browser extension</p>
+              <h3>Script Saver</h3>
+              <p>
+                Microsoft Teams 라이브 캡션과 Vimeo 강의 자막을 캡처해 Markdown, TXT, JSON으로 저장하고
+                Gemini 또는 OpenAI 요약까지 이어주는 Chrome/Edge 확장입니다.
+              </p>
+              <ul class="tag-list" aria-label="Script Saver highlights">
+                <li>Manifest V3</li>
+                <li>Teams captions</li>
+                <li>Vimeo subtitles</li>
+                <li>AI summary</li>
+              </ul>
+            </div>
+            <a class="text-link" href="https://github.com/geondongkim/Minute-Second-Script-Saver">
+              GitHub repository
+            </a>
+          </article>
+
+          <article class="project-card project-card-accent-b">
+            <div class="project-media image-media">
+              <img src="assets/audio-extractor-workflow.png" alt="Audio Extractor STT workflow visual">
+            </div>
+            <div class="project-body">
+              <p class="project-type">FastAPI and React</p>
+              <h3>Audio Extractor STT</h3>
+              <p>
+                동영상 업로드 후 FFmpeg 오디오 추출, Faster-Whisper 기반 한국어 STT, WhisperX 화자 분리,
+                Gemini 회의록 생성을 한 흐름으로 처리합니다.
+              </p>
+              <ul class="tag-list" aria-label="Audio Extractor STT highlights">
+                <li>Video upload</li>
+                <li>SSE progress</li>
+                <li>Diarization</li>
+                <li>Downloads</li>
+              </ul>
+            </div>
+            <a class="text-link" href="https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT">
+              GitHub repository
+            </a>
+          </article>
+
+          <article class="project-card project-card-accent-c">
+            <div class="project-media slide-media" aria-hidden="true">
+              <div class="slide-stack">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="project-body">
+              <p class="project-type">Local CLI engine</p>
+              <h3>Lecture Slide Notes</h3>
+              <p>
+                Vimeo, YouTube, 로컬 동영상에서 슬라이드 전환을 감지하고 OCR을 더해 searchable PDF와
+                NotebookLM 친화 Markdown을 생성하는 로컬 처리 엔진입니다.
+              </p>
+              <ul class="tag-list" aria-label="Lecture Slide Notes highlights">
+                <li>yt-dlp</li>
+                <li>OCR</li>
+                <li>Searchable PDF</li>
+                <li>MCP ready</li>
+              </ul>
+            </div>
+            <a class="text-link" href="https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes">
+              GitHub repository
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section guide-section" aria-labelledby="guide-title">
+        <div class="section-heading">
+          <p class="eyebrow">Guide</p>
+          <h2 id="guide-title">상황별로 고르기</h2>
+        </div>
+        <div class="guide-list">
+          <article class="guide-row">
+            <h3>웹 회의나 강의 자막을 바로 저장해야 할 때</h3>
+            <p>Script Saver로 브라우저 안에서 캡션을 수집하고 요약합니다.</p>
+          </article>
+          <article class="guide-row">
+            <h3>녹화 파일을 회의록으로 바꿔야 할 때</h3>
+            <p>Audio Extractor STT로 업로드부터 전사, 화자 분리, 결과 다운로드까지 처리합니다.</p>
+          </article>
+          <article class="guide-row">
+            <h3>강의 영상을 복습 자료로 정리해야 할 때</h3>
+            <p>Lecture Slide Notes로 슬라이드 PDF와 NotebookLM용 Markdown을 생성합니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section setup-section" id="setup" aria-labelledby="setup-title">
+        <div class="setup-layout">
+          <div class="setup-copy">
+            <p class="eyebrow">Local setup</p>
+            <h2 id="setup-title">세 프로젝트를 한 번에 가져오기</h2>
+            <p>
+              아래 명령은 <code>external/</code> 폴더에 3개 프로젝트를 clone하거나, 이미 있으면 fast-forward로 업데이트합니다.
+              루트 저장소는 이 폴더를 추적하지 않도록 설정되어 있습니다.
+            </p>
+          </div>
+          <div class="command-panel">
+            <button class="copy-button" type="button" data-copy-target="bootstrap-command">
+              Copy command
+            </button>
+            <pre><code id="bootstrap-command">mkdir -p external
+
+while read -r name url; do
+  if [ -d "external/$name/.git" ]; then
+    git -C "external/$name" pull --ff-only
+  else
+    git clone "$url" "external/$name"
+  fi
+done &lt;&lt;'REPOS'
+Minute-Second-Script-Saver https://github.com/geondongkim/Minute-Second-Script-Saver.git
+Minute-Second-Audio-Extractor-STT https://github.com/geondongkim/Minute-Second-Audio-Extractor-STT.git
+Minute-Second-Lecture-Slide-Notes https://github.com/geondongkim/Minute-Second-Lecture-Slide-Notes.git
+REPOS</code></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Minute Second</span>
+      <a href="https://github.com/geondongkim/Minute-Second">github.com/geondongkim/Minute-Second</a>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
